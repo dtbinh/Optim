@@ -5,7 +5,7 @@ clc;
 import casadi.*
 
 T = 1;   % End time
-N = 100; % Number of control intervals
+N = 10; % Number of control intervals
 dt = T/N;
 t = linspace(0,T,N+1); % time vector
 
@@ -105,5 +105,9 @@ figure
 plot(sol.value(U)')
 
 U_sol = sol.value(U);
-save('fit','U_sol');
+
+%% Save the result
+save('fit','traj');
+
+
 

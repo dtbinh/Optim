@@ -117,3 +117,6 @@ figure
 plot(tgrid(1:end-1), accx_opt, 'b')
 hold on
 plot(tgrid(1:end-1), accy_opt, 'g')
+
+%% save the solution
+save('ex7sol','posx_opt','posy_opt','velx_opt','vely_opt', 'accx_opt', 'accy_opt')
