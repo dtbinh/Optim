@@ -1,0 +1,21 @@
+SLICOT Library Subdirectory src_aux
+-----------------------------------
+
+SLICOT Library Subdirectory src_aux contains few auxiliary LAPACK and
+BLAS source files which either slightly differ from the standard
+distribution, or are explicitly needed for generating the SLICOT-based
+MATLAB executable files (MEX-files) for a specific platform.
+
+The currently included files are dcabs1 and dlagv2.
+Other files might be included, as specified in the Release.Notes
+or Release.History files.
+
+The file dcabs1 is a copy of the BLAS routine which might be missing
+in some distributions.  To generate the object code for dcabs1, the
+file makefile in the subdirectory src_aux should be modified accordingly
+(see the included comments).
+
+A variable used but not always initialized in the file dlagv2 has been set.
+
+More details are given in the file Installation.txt from the SLICOT
+root directory.

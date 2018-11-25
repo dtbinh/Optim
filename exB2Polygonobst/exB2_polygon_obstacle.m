@@ -1,6 +1,8 @@
 clear all
 close all
 clc
+%%
+
 
 N = 100; % Control discretization
 m = 500; % vehicle mass [kg]
@@ -35,14 +37,45 @@ v_max = 10.;
 x_init = [0., 0., 0., 0.];
 x_final = [10., 10., 0., 0.];
 
+% =========================================================================
 % obstacle info
 % rectangle described as polygon:
-w = 1; % width
-h = 1; % height
-%obs_pos1 = [3,2];
-%obs_rad1 = 1;
-%obs_pos2 = [6,7];
-%obs_rad2 = 1;
+xl = 4;
+xu = 5; 
+yl = 4;
+yu = 5;
+
+% H*x <= h formulation:
+H = [-1  0;
+      1  0;
+      0 -1;
+      0  1];
+h = [-xl;
+      xu;
+     -yl;
+      yu];
+  
+% Draw the obstacle
+x_y = xl:0.1:xu;
+y_yl = yl*ones(size(x_y));
+y_yu = yu*ones(size(x_y));
+
+y_x = yl:0.1:yu;
+x_xl = xl*ones(size(y_x));
+x_xu = xu*ones(size(y_x));
+
+figure('Name', 'Rectangular Obstacle')
+plot(x_y, y_yl, x_y, y_yu, x_xl, y_x, x_xu, y_x)
+xlim([0 10])
+ylim([0 10])
+
+% =========================================================================
+% obs_pos = [5,5];
+% obs_rad = 1;
+% obs_pos1 = [3,2];
+% obs_rad1 = 1;
+% obs_pos2 = [6,7];
+% obs_rad2 = 1;
 
 
 for k=1:N
@@ -52,15 +85,21 @@ for k=1:N
    % shooting constraint
    xf = rk4(ode,T/N,xk,[ddx(k), ddy(k)]);
    opti.subject_to(xk_plus==xf);
+  
 end
 
+
+% =========================================================================
+% obstacle constraint:
+xy = [x,y]';
+opti.subject_to((H(1,:)*xy>=h(1)).*(H(2,:)*xy>=h(2)).*(H(3,:)*xy>=h(3)).*(H(4,:)*xy>=h(4))== 0);
+% =========================================================================
 % path constraint
 opti.subject_to(v_min <= dx <= v_max);
 opti.subject_to(v_min <= dy <= v_max);
 opti.subject_to(F_min <= m*ddx <= F_max);
 opti.subject_to(F_min <= m*ddy <= F_max);
-% obstacle constraint:
-opti.subject_to((x-obs_pos(1)).^2 + (y-obs_pos(2)).^2 >= obs_rad^2);
+
 opti.subject_to(T >= 0);
 
 opti.subject_to({x(1)==x_init(1), x(end)==x_final(1), y(1)==x_init(2), y(end)==x_final(2)});
@@ -103,8 +142,11 @@ plot(tgrid, posy_opt, 'g')
 figure('Name','Position2d')
 plot(posx_opt,posy_opt,'b-o')
 hold on
-arc = 0:0.01:2*pi;
-circle = plot(obs_pos(1)+obs_rad*cos(arc), obs_pos(2)+obs_rad*sin(arc),'r');
+plot(x_y, y_yl, x_y, y_yu, x_xl, y_x, x_xu, y_x)
+xlim([0 10])
+ylim([0 10])
+% arc = 0:0.01:2*pi;
+% circle = plot(obs_pos(1)+obs_rad*cos(arc), obs_pos(2)+obs_rad*sin(arc),'r');
 % circle = plot(obs_pos1(1)+obs_rad1*cos(arc), obs_pos1(2)+obs_rad1*sin(arc),'r');
 % circle = plot(obs_pos2(1)+obs_rad2*cos(arc), obs_pos2(2)+obs_rad2*sin(arc),'r');
 

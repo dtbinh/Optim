@@ -5,7 +5,7 @@ clc;
 import casadi.*
 
 T = 1;   % End time
-N = 100; % Number of control intervals
+N = 10; % Number of control intervals
 dt = T/N;
 t = linspace(0,T,N+1); % time vector
 
@@ -22,6 +22,8 @@ i2 = SX.sym('i2'); % curvature speed translational Frenet-Serret
 i3 = SX.sym('i3'); % torsion speed translational Frenet-Serret
 u = [i1 ; i2 ; i3];
 nu = size(u,1);
+
+
 
 % State dynamics equations of the form: dx/dt = f(x,u,t)
 dRt = Rt*skew([i3;i2;0]);
@@ -101,8 +103,9 @@ plot3(traj(1,:),traj(2,:),traj(3,:),'ro')
 axis equal
 
 view([-76 14])
-figure
+figure('Name','Invariants solution')
 plot(sol.value(U)')
+
 
 U_sol = sol.value(U);
 save('fit','U_sol');

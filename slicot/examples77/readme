@@ -1,0 +1,20 @@
+SLICOT Library Subdirectory examples77
+--------------------------------------
+
+SLICOT Library Subdirectory examples77 contains all source files for
+the Fortran 77 example programs calling the SLICOT Library routines,
+the associated data files (files *.dat), and reference results
+(files *.res).  The Fortran files differ from those in the subdirectory
+examples in having references to the INTRINSIC functions MAX and MIN
+in PARAMETER statements avoided, as they are not allowed in Fortran 77.
+The reference results have been computed on a Sun Ultra 2 machine, for
+the Unix distribution, and on an Intel Pentium 3 machine, for the
+Windows distribution.
+
+If executable Fortran 77 example programs are created when installing
+the SLICOT software (as described in the Installation.txt file from the
+SLICOT root directory), these programs are executed and their results
+are stored in the files *.exa (with the same name as for the files with
+data and reference results, and extension exa).  More details for
+executing other tasks, e.g., cleaning the subdirectory examples77,
+are given in the file makefile included in this subdirectory.

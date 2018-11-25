@@ -5,7 +5,7 @@ close all;
 import casadi.*
 
 T = 1;   % End time
-N = 100; % Number of control intervals
+N = 10; % Number of control intervals
 dt = T/N;
 
 % System states
@@ -55,7 +55,12 @@ hold on
 plot3(traj(1,:),traj(2,:),traj(3,:),'b-')
 axis equal
 
-function xf = integrate(H,dt,x,u)
-    % integration for constant H.
-    xf = (expm(H(u)*dt)-1)*x
-end
+%%
+% function xf = integrate(H,dt,x,u)
+%     % integration for constant H.
+%     xf = (expm(H(u)*dt)-1)*x
+% end
+
+%% Save result
+save('exact_int','traj')
+

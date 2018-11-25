@@ -8,7 +8,7 @@ close all
 import casadi.*
 
 Tx = 1;   % End time
-Nx = 100; % Number of control intervals
+Nx = 10; % Number of control intervals
 dtx = Tx/Nx;
 tx = linspace(0,Tx,Nx+1); % time vector
 
@@ -77,7 +77,7 @@ opti.subject_to(Rtx{1}'*Rtx{1} == eye(3));
 % Dynamic constraints
 for k=1:Nx
     % Integrate current state to obtain next state
-    Xk_endx = integrate_const_h(Hsimp,dtx,Xx{k},Ux(:,k));
+    Xk_endx = integrate(Hsimp,dtx,Xx{k},Ux(:,k));
     
     % Gap closing constraint
     opti.subject_to(Xk_endx==Xx{k+1});
@@ -125,6 +125,9 @@ legend('pos_{meas}', 'exact integration')
 view([-76 14])
 figure
 plot(solx.value(Ux)')
-
 U_solx = solx.value(Ux);
-save('fitx','U_solx');
+
+
+%% Save the result
+save('fitx','trajx');
+

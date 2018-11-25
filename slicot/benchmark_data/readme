@@ -1,0 +1,12 @@
+SLICOT Library Subdirectory benchmark_data
+------------------------------------------
+
+SLICOT Library Subdirectory benchmark_data contains data files (*.dat) for the
+SLICOT Library benchmark collections.  These files are used by the Chapter B
+SLICOT routines, but they could also be used independently for testing some
+algorithms on difficult numerical problems.  Special standard or generalized
+continuous-time or discrete-time systems are generated, as well as examples
+of Riccati or (generalized) Lyapunov equations.  To be used in a specific
+program, via calls to the Chapter B routines, the required data files should
+be available in the directory where the executable program has been launched
+from.
