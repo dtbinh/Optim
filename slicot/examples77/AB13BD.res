@@ -1,3 +1,0 @@
- AB13BD EXAMPLE PROGRAM RESULTS
-
- The L2-norm of the system =    7.93948D+00
