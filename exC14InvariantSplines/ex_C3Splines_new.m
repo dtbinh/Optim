@@ -16,9 +16,9 @@ meas_pos = [t;0.1*t.*sin(4*pi*t);0.1*t.*cos(4*pi*t)];
 opti = splines.OptiSpline();
 
 % Set up splines
-d = 10; % number of knots
+d = 20; % number of knots
 L = T; % spline domain [0 , L ]
-n = 3; % degree of splines
+n = 5; % degree of splines
 Bl  = BSplineBasis([0 , L], d, n);
 
 % System states
@@ -92,7 +92,7 @@ end
 objective_reg = 0;
 for k=1:N-1
     e = u.eval(k+1) - u.eval(k);
-    objective_reg = objective_reg + 1e-2*e'*e;
+    objective_reg = objective_reg + 1e-4*e'*e;
 end
 
 % Initialize states
