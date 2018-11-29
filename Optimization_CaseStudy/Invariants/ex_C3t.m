@@ -65,8 +65,9 @@ opti.subject_to(Rt{1}'*Rt{1} == eye(3));
 % Dynamic constraints
 for k=1:N
     % Integrate current state to obtain next state
+    % =====================================================================
     Xk_end = rk4(ode_simp,ds(k),X{k},U(:,k));
-    
+    % =====================================================================
     % Gap closing constraint
     opti.subject_to(Xk_end==X{k+1});
     

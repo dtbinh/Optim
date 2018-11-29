@@ -1,19 +1,24 @@
-% clear all;
+clear all;
 close all;
 clc;
-addpath('C:\Users\Wolf/casadi-windows-matlabR2016a-v3.4.5')
+
 import casadi.*
 
-%%
 T = 1;   % End time
 N = 100; % Number of control intervals
 dt = T/N;
 t = linspace(0,T,N+1); % time vector
 
+fit = load('fit');
+U_ref = fit.U_sol;
+
+meas_pos = [t;0.1*t.*sin(4*pi*t);0.1*t.*cos(4*pi*t)];
+
+
 % System states
-p  = SX.sym('p',3,1); % object position
-Rt = SX.sym('Rt',3,3); % translational Frenet-Serret frame
-x = [p; Rt(:)];
+p = SX.sym('p',3,1); % object position
+Rt  = SX.sym('Rt' ,3,3); % translational Frenet-Serret frame
+x = [p;Rt(:)];
 
 % System controls (invariants)
 i1 = SX.sym('i1'); % object translation speed
@@ -26,7 +31,7 @@ nu = size(u,1);
 dRt = Rt*skew([i3;i2;0]);
 dp = Rt*[i1;0;0];
 
-rhs = [dp; dRt(:)];
+rhs = [dp;dRt(:)];
 
 % Define ordinary differential equations
 ode_simp = Function('ode_simp',{x,u},{rhs});
@@ -48,17 +53,21 @@ end
 
 U = opti.variable(nu,N);
 
-opti.subject_to(U(1,:)>=0);
+opti.subject_to(U(1,:)>=0); % Can only move forward
 
 % FS_frame - constrain to be orthogonal (only needed for one timestep, property is propagated by integrator)
 opti.subject_to(Rt{1}'*Rt{1} == eye(3));
 
+P_start = [0;1;0];
+P_end = [1;1;1];
+
+opti.subject_to(p{1}==P_start);
+opti.subject_to(p{end}==P_end);
+
 % Dynamic constraints
 for k=1:N
     % Integrate current state to obtain next state
-    Xk_end = rk4(ode_simp,dt*U(1,k),X{k},U(:,k));
-%     Xk_end = rk4(ode_simp,dt,X{k},U(:,k));
-
+    Xk_end = rk4(ode_simp,dt,X{k},U(:,k));
     
     % Gap closing constraint
     opti.subject_to(Xk_end==X{k+1});
@@ -66,33 +75,25 @@ for k=1:N
 end
 
 % Construct objective
-objective_fit = 0;
-meas_pos = [0.5*t;0.1*t.*sin(2*pi*t);0.1*t.*cos(2*pi*t)];
-for k=1:N+1
-    e = p{k} - meas_pos(:,k); % position error
-    objective_fit = objective_fit + e'*e;
+objective = 0;
+for k=1:N
+    e = U(:,k) - U_ref(:,k); % position error
+    objective = objective + e'*e;
 end
 
-objective_reg = 0;
-for k=1:N-1
-    e = U(:,k+1) - U(:,k);
-    objective_reg = objective_reg + 1e-4*e'*e;
-end
+opti.set_initial(U, U_ref);
 
 % Initialize states
 for k=1:N+1
     opti.set_initial(Rt{k}, eye(3));
-    opti.set_initial(p{k}, meas_pos(:,k));
 end
 
-opti.minimize(objective_fit + objective_reg);
+opti.minimize(objective);
 opti.solver('ipopt');
 
 % Solve the NLP
 sol = opti.solve();
 %%
-
-sol.value(objective_fit)
 
 figure
 hold on
@@ -100,17 +101,12 @@ plot3(meas_pos(1,:),meas_pos(2,:),meas_pos(3,:),'b-')
 
 traj = sol.value([p{:}]);
 plot3(traj(1,:),traj(2,:),traj(3,:),'ro')
+plot3(P_start(1),P_start(2),P_start(3),'kx')
+plot3(P_end(1),P_end(2),P_end(3),'ks')
 axis equal
 
 view([-76 14])
 figure
 hold on
 plot(sol.value(U)')
-plot(U_sol_s')
-legend('i1', 'i2', 'i3', 'i1_s', 'i2_s', 'i3_s')
-U_sol = sol.value(U);
-save('fit','U_sol');
-%% plot s as function of t
-figure()
-plot(t(1:end-1),t(1:end-1).*full(U_sol_s(1,:)))
-
+plot(U_ref')

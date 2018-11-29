@@ -1,14 +1,15 @@
-% clear all;
+clear all;
 close all;
 clc;
-addpath('C:\Users\Wolf/casadi-windows-matlabR2016a-v3.4.5')
+
 import casadi.*
 
-%%
 T = 1;   % End time
-N = 100; % Number of control intervals
+N = 10; % Number of control intervals
 dt = T/N;
 t = linspace(0,T,N+1); % time vector
+
+meas_pos = [t;0.1*t.*sin(4*pi*t);0.1*t.*cos(4*pi*t)];
 
 % System states
 p  = SX.sym('p',3,1); % object position
@@ -21,6 +22,8 @@ i2 = SX.sym('i2'); % curvature speed translational Frenet-Serret
 i3 = SX.sym('i3'); % torsion speed translational Frenet-Serret
 u = [i1 ; i2 ; i3];
 nu = size(u,1);
+
+
 
 % State dynamics equations of the form: dx/dt = f(x,u,t)
 dRt = Rt*skew([i3;i2;0]);
@@ -56,9 +59,7 @@ opti.subject_to(Rt{1}'*Rt{1} == eye(3));
 % Dynamic constraints
 for k=1:N
     % Integrate current state to obtain next state
-    Xk_end = rk4(ode_simp,dt*U(1,k),X{k},U(:,k));
-%     Xk_end = rk4(ode_simp,dt,X{k},U(:,k));
-
+    Xk_end = rk4(ode_simp,dt,X{k},U(:,k));
     
     % Gap closing constraint
     opti.subject_to(Xk_end==X{k+1});
@@ -67,7 +68,6 @@ end
 
 % Construct objective
 objective_fit = 0;
-meas_pos = [0.5*t;0.1*t.*sin(2*pi*t);0.1*t.*cos(2*pi*t)];
 for k=1:N+1
     e = p{k} - meas_pos(:,k); % position error
     objective_fit = objective_fit + e'*e;
@@ -103,14 +103,9 @@ plot3(traj(1,:),traj(2,:),traj(3,:),'ro')
 axis equal
 
 view([-76 14])
-figure
-hold on
+figure('Name','Invariants solution')
 plot(sol.value(U)')
-plot(U_sol_s')
-legend('i1', 'i2', 'i3', 'i1_s', 'i2_s', 'i3_s')
+
+
 U_sol = sol.value(U);
 save('fit','U_sol');
-%% plot s as function of t
-figure()
-plot(t(1:end-1),t(1:end-1).*full(U_sol_s(1,:)))
-
