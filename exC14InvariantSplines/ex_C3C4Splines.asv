@@ -7,7 +7,7 @@ import splines.*
 
 %%
 T = 1;   % End time
-N = 50; % Number of control intervals
+N = 100; % Number of control intervals
 dt = T/N;
 t = linspace(0,T,N+1); % time vector
 
@@ -16,9 +16,9 @@ meas_pos = [t;0.1*t.*sin(4*pi*t);0.1*t.*cos(4*pi*t)];
 opti = splines.OptiSpline();
 
 % Set up splines
-d = 10; % number of knots
+d = 15; % number of knots
 L = T; % spline domain [0 , L ]
-n = 3; % degree of splines
+n = 5; % degree of splines
 Bl  = BSplineBasis([0 , L], d, n);
 
 % System states
@@ -110,29 +110,25 @@ axis equal
 
 view([-76 14])
 figure
+u = sol.value(u);
+plot(u.list_eval(t))
+
 u_sol = sol.value(u);
-plot(u_sol.list_eval(t))
-
-u_sol_C3 = u_sol.list_eval(t);
-
 
 %% Save results
-save('Ex_C3spline','u_sol_C3','traj');
-
-
-
+save('Ex_C3spline','u_sol','traj');
 
 %% ========================================================================
-%   Ex_C4Splines
+%  Ex_C4Splines
 %  ========================================================================
 
 % fit = load('fit');
 u_ref = u_sol;
 
-% T = 1;   % End time
-% N = 100; % Number of control intervals
-% dt = T/N;
-% t = linspace(0,T,N+1); % time vector
+T = 1;   % End time
+N = 100; % Number of control intervals
+dt = T/N;
+t = linspace(0,T,N+1); % time vector
 
 % NOTE: not used to fit here, only for comparison in figures.
 % Actual fit is on spline solution from ex_C3Splines (u_ref)
@@ -141,10 +137,10 @@ meas_pos = [t;0.1*t.*sin(4*pi*t);0.1*t.*cos(4*pi*t)];
 opti = splines.OptiSpline();
 
 % Set up splines
-% d = 15; % number of knots
-% L = T; % spline domain [0 , L ]
-% n = 5; % degree of splines
-% Bl  = BSplineBasis([0 , L], d, n);
+d = 15; % number of knots
+L = T; % spline domain [0 , L ]
+n = 5; % degree of splines
+Bl  = BSplineBasis([0 , L], d, n);
 
 % System states
 p = SX.sym('p',3,1); % object position
@@ -225,8 +221,7 @@ opti.solver('ipopt');
 % Solve the NLP
 sol = opti.solve();
 
-u_sol = sol.value(u);
-u_sol_C4 = u_sol.list_eval(t);
+u_sol_C4 = sol.value(u);
 %%
 
 figure
@@ -242,8 +237,8 @@ axis equal
 view([-76 14])
 figure
 hold on
-plot(u_sol.list_eval(t))
+plot(u_sol_C4.list_eval(t))
 plot(u_ref.list_eval(t))
 
 %% Save results
-save('Ex_C4spline','u_sol_C4','traj');
+save('Ex_C4spline','u_sol','traj');
