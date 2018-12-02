@@ -1,12 +1,12 @@
 % clear all;
 close all;
 clc;
-addpath('C:\Users\Wolf/casadi-windows-matlabR2016a-v3.4.5')
+% addpath('C:\Users\Wolf/casadi-windows-matlabR2016a-v3.4.5')
 import casadi.*
 
 %%
 T = 1;   % End time
-N = 100; % Number of control intervals
+N = 10; % Number of control intervals
 dt = T/N;
 t = linspace(0,T,N+1); % time vector
 

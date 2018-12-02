@@ -94,7 +94,7 @@ end
 objective_regx = 0;
 for k=1:Nx-1
     ex = Ux(:,k+1) - Ux(:,k);
-    objective_regx = objective_regx + 1e-4*ex'*ex;
+    objective_regx = objective_regx + 1e-5*(ex'*ex);
 end
 
 % Initialize states

@@ -1,7 +1,7 @@
 clear all
 close all
 
-addpath('C:\Users\Wolf/casadi-windows-matlabR2016a-v3.4.5')
+% addpath('C:\Users\Wolf/casadi-windows-matlabR2016a-v3.4.5')
 import casadi.*
 
 %% Data

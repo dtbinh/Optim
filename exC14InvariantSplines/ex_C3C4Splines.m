@@ -7,7 +7,7 @@ import splines.*
 
 %%
 T = 1;   % End time
-N = 50; % Number of control intervals
+N = 20; % Number of control intervals
 dt = T/N;
 t = linspace(0,T,N+1); % time vector
 
@@ -84,7 +84,7 @@ end
 objective_reg = 0;
 for k=1:N-1
     e = u.eval(t(k+1)) - u.eval(t(k));
-    objective_reg = objective_reg + 1e-4*e'*e;
+    objective_reg = objective_reg + 1e-4*(e'*e);
 end
 
 % Initialize states
