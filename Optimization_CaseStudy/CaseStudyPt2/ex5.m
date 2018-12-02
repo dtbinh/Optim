@@ -12,8 +12,8 @@ import splines.*
 % Note: feel free to play with the degree, knots, coefficients,... and see
 % what happens
 
-degree = 2
-n_knots = 3
+degree = 5
+n_knots = 20
 L = 1  % domain
 
 B = BSplineBasis([0,L], n_knots, degree); %knots 0 , 0.5 , 1 ; degree 1

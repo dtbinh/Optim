@@ -5,7 +5,7 @@ clc;
 import casadi.*
 
 T = 1;   % End time
-N = 10; % Number of control intervals
+N = 50; % Number of control intervals
 dt = T/N;
 t = linspace(0,T,N+1); % time vector
 
@@ -106,6 +106,6 @@ view([-76 14])
 figure('Name','Invariants solution')
 plot(sol.value(U)')
 
-
+%% Save results
 U_sol = sol.value(U);
-save('fit','U_sol');
+save('Ex_C3','U_sol','traj','meas_pos')

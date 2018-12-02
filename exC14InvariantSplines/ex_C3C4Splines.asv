@@ -114,7 +114,9 @@ u = sol.value(u);
 plot(u.list_eval(t))
 
 u_sol = sol.value(u);
-% save('fit','u_sol');
+
+%% Save results
+save('Ex_C3spline','u_sol','traj');
 
 %% ========================================================================
 %  Ex_C4Splines
@@ -238,4 +240,5 @@ hold on
 plot(u_sol_C4.list_eval(t))
 plot(u_ref.list_eval(t))
 
-
+%% Save results
+save('Ex_C4spline','u_sol','traj');

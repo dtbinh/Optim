@@ -1,0 +1,37 @@
+clear
+close all
+
+%% Load data
+
+C3ms = load('Ex_C3');
+C4ms = load('Ex_C4');
+C3sp = load('Ex_C3Spline');
+C4sp = load('Ex_C4Spline');
+
+meas_pos = C3ms.meas_pos;
+
+
+%% Ex C3
+% compare reference VS ms VS spline
+figure('Name','Ex_C3: Comparison Position - reference VS ms VS spline, ')
+hold on
+plot3(meas_pos(1,:),meas_pos(2,:),meas_pos(3,:),'b-')
+plot3(C3ms.traj(1,:),C3ms.traj(2,:),C3ms.traj(3,:),'ro')
+plot3(C3sp.traj(1,:),C3sp.traj(2,:),C3sp.traj(3,:),'go')
+
+figure('Name','Ex_C3: Comparison Invariants - ms VS spline, ')
+hold on
+plot(C3ms.U_sol','b-')
+plot(C3sp.u_sol_C3,'r-')
+legend('m','')
+
+% voor N = 100, graad 5 met 15 knopen geen verschil te zien tussen spline en ms
+
+% differences 
+
+
+%% Ex C4
+% compare reference VS ms VS spline
+
+
+% differences 
