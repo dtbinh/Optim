@@ -45,9 +45,9 @@ end
 
 figure('Name', 'Huber function')
 hold on
-plot(x_value, 0.5*x_value.^2, 'LineWidth',2.5)
-plot(x_value, delta*(abs(x_value) - 0.5*delta), 'LineWidth',2.5)
-plot(x_value, y_value, 'LineWidth',2.5)
+plot(x_value, 0.5*x_value.^2, 'Color', [0.9290, 0.6940, 0.1250], 'LineWidth',2.5)
+plot(x_value, delta*(abs(x_value) - 0.5*delta), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.5)
+plot(x_value, y_value, 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.5)
 
 
 % Set up cost function
@@ -110,10 +110,10 @@ y_circle_L1 = y_c_L1 + radius * sin(alpha);
 %% Plot circles to compare methods
 figure('Name', 'CSomparison between L1 norm, L2 norm and Huber norm')
 hold on
-plot(x_circle_L1, y_circle_L1, 'LineWidth',2.5)
-plot(x_circle_L2, y_circle_L2, 'LineWidth',2.5)
-plot(x_circle_hub, y_circle_hub, 'LineWidth',2.5)
-scatter(x_data, y_data, 'LineWidth',2.5)
+plot(x_circle_L1, y_circle_L1, 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.5)
+plot(x_circle_L2, y_circle_L2, 'Color', [0.9290, 0.6940, 0.1250], 'LineWidth',2.5)
+plot(x_circle_hub, y_circle_hub, 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.5)
+scatter(x_data, y_data, 40.0, [0.8500, 0.3250, 0.0980], 'LineWidth',2.5)	
 legend('L1 norm', 'L2 norm', 'Huber norm', 'data points')
 xlim([0.0 4])
 ylim([-1.5 1.5])

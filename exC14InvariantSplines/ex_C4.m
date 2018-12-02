@@ -5,11 +5,11 @@ clc;
 import casadi.*
 
 T = 1;   % End time
-N = 50; % Number of control intervals
+N = 100; % Number of control intervals
 dt = T/N;
 t = linspace(0,T,N+1); % time vector
 
-fit = load('Ex_c3');
+fit = load('fit');
 U_ref = fit.U_sol;
 
 meas_pos = [t;0.1*t.*sin(4*pi*t);0.1*t.*cos(4*pi*t)];
@@ -106,15 +106,7 @@ plot3(P_end(1),P_end(2),P_end(3),'ks')
 axis equal
 
 view([-76 14])
-
-U_sol = sol.value(U);
-
 figure
 hold on
-plot(U_sol')
+plot(sol.value(U)')
 plot(U_ref')
-
-
-%% Save results
-save('Ex_C4', 'traj', 'U_sol')
-
