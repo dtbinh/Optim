@@ -109,7 +109,7 @@ plot(sol.value(U)')
 plot(U_sol_s')
 legend('i1', 'i2', 'i3', 'i1_s', 'i2_s', 'i3_s')
 U_sol = sol.value(U);
-save('fit','U_sol');
+save('ExC3','U_sol');
 %% plot s as function of t
 figure()
 plot(t(1:end-1),t(1:end-1).*full(U_sol_s(1,:)))
