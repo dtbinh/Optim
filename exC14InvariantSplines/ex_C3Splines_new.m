@@ -1,7 +1,7 @@
 clear all;
 close all;
 clc;
-% addpath('C:\Users\Wolf\Documents\2de Master\Optimization\optispline_windows_matlabR2014a_v0.1')
+addpath('C:\Users\Wolf\Documents\2de Master\Optimization\optispline_windows_matlabR2014a_v0.1')
 import casadi.*
 import splines.*
 
@@ -16,9 +16,9 @@ meas_pos = [t;0.1*t.*sin(4*pi*t);0.1*t.*cos(4*pi*t)];
 opti = splines.OptiSpline();
 
 % Set up splines
-d = 15; % number of knots
+d = 5; % degree of splines
 L = T; % spline domain [0 , L ]
-n = 5; % degree of splines
+n = 15; % number of knots
 Bl  = BSplineBasis([0 , L], d, n);
 
 % System states
