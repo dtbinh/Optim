@@ -1,13 +1,13 @@
 clear all;
 close all;
 clc;
-% addpath('C:\Users\Wolf\Documents\2de Master\Optimization\optispline_windows_matlabR2014a_v0.1')
+addpath('C:\Users\Wolf\Documents\2de Master\Optimization\optispline_windows_matlabR2014a_v0.1')
 import casadi.*
 import splines.*
 
 %%
 T = 1;   % End time
-N = 50; % Number of control intervals
+N = 30; % Number of control intervals
 dt = T/N;
 t = linspace(0,T,N+1); % time vector
 
@@ -16,9 +16,9 @@ meas_pos = [t;0.1*t.*sin(4*pi*t);0.1*t.*cos(4*pi*t)];
 opti = splines.OptiSpline();
 
 % Set up splines
-d = 10; % number of knots
+d = 5; % degree of splines
 L = T; % spline domain [0 , L ]
-n = 3; % degree of splines
+n = 15; % number of knots
 Bl  = BSplineBasis([0 , L], d, n);
 
 % System states
@@ -84,7 +84,7 @@ end
 objective_reg = 0;
 for k=1:N-1
     e = u.eval(t(k+1)) - u.eval(t(k));
-    objective_reg = objective_reg + 1e-4*e'*e;
+    objective_reg = objective_reg + 1e-5*e'*e;
 end
 
 % Initialize states
@@ -102,49 +102,39 @@ sol = opti.solve();
 
 figure
 hold on
-plot3(meas_pos(1,:),meas_pos(2,:),meas_pos(3,:),'b-')
-
 traj = sol.value([p{:}]);
-plot3(traj(1,:),traj(2,:),traj(3,:),'ro')
+plot3(traj(1,:),traj(2,:),traj(3,:),'ko')
+plot3(meas_pos(1,:),meas_pos(2,:),meas_pos(3,:), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.5)
+legend('spline invariants', 'measurement')
 axis equal
 
 view([-76 14])
-figure
 u_sol = sol.value(u);
-plot(u_sol.list_eval(t))
-
-u_sol_C3 = u_sol.list_eval(t);
-
-
-%% Save results
-save('Ex_C3spline','u_sol_C3','traj');
-
-
-
+u_full = full(u_sol);
+fit = load('fit');
+no_spline = fit.U_sol;
+u = u_full.list_eval(t(1:end-1));
+figure
+hold on
+plot(t(1:end-1), u(:,1), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
+plot(t(1:end-1), no_spline(1,:), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
+plot(t(1:end-1), u(:,2:3), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
+plot(t(1:end-1), no_spline(2:3,:), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
+legend('spline invariants', 'no spline invariants')
+% save('fit','u_sol');
 
 %% ========================================================================
-%   Ex_C4Splines
+%  Ex_C4Splines
 %  ========================================================================
 
 % fit = load('fit');
 u_ref = u_sol;
-
-% T = 1;   % End time
-% N = 100; % Number of control intervals
-% dt = T/N;
-% t = linspace(0,T,N+1); % time vector
 
 % NOTE: not used to fit here, only for comparison in figures.
 % Actual fit is on spline solution from ex_C3Splines (u_ref)
 meas_pos = [t;0.1*t.*sin(4*pi*t);0.1*t.*cos(4*pi*t)];
 
 opti = splines.OptiSpline();
-
-% Set up splines
-% d = 15; % number of knots
-% L = T; % spline domain [0 , L ]
-% n = 5; % degree of splines
-% Bl  = BSplineBasis([0 , L], d, n);
 
 % System states
 p = SX.sym('p',3,1); % object position
@@ -225,25 +215,29 @@ opti.solver('ipopt');
 % Solve the NLP
 sol = opti.solve();
 
-u_sol = sol.value(u);
-u_sol_C4 = u_sol.list_eval(t);
+u_sol_C4 = sol.value(u);
 %%
 
 figure
 hold on
-plot3(meas_pos(1,:),meas_pos(2,:),meas_pos(3,:),'b-')
-
 traj = sol.value([p{:}]);
-plot3(traj(1,:),traj(2,:),traj(3,:),'ro')
-plot3(P_start(1),P_start(2),P_start(3),'kx')
-plot3(P_end(1),P_end(2),P_end(3),'ks')
+plot3(traj(1,:),traj(2,:),traj(3,:), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.5)
+plot3(meas_pos(1,:),meas_pos(2,:),meas_pos(3,:),'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.5)
+% plot3(P_start(1),P_start(2),P_start(3),'kx')
+% plot3(P_end(1),P_end(2),P_end(3),'ks')
 axis equal
+legend('new traject', 'measurement')
 
 view([-76 14])
+u_new = full(u_sol_C4).list_eval(t(1:end-1));
+u = u_ref.list_eval(t(1:end-1));
 figure
 hold on
-plot(u_sol.list_eval(t))
-plot(u_ref.list_eval(t))
+plot(t(1:end-1), u_new(:,1), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
+plot(t(1:end-1), u(:,1), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
+plot(t(1:end-1), u_new(:,2:3), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
+plot(t(1:end-1), u(:,2:3), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
+legend('new traject', 'measurement')
 
 %% Save results
 save('Ex_C4spline','u_sol_C4','traj');
