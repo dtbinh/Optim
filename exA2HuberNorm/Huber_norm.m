@@ -7,7 +7,7 @@ import casadi.*
 %% Data
 data = [1 2-sqrt(2)/2 2 3 2;
         0 sqrt(2)/2   1 0 -1];
-data_perturbed = [1 2-sqrt(2)/2 2.5 3 2;
+data_perturbed = [1 2-sqrt(2)/2 3.5 3 2;
                   0 sqrt(2)/2   1   0 -1];
 % 
 % x_data = data(1,:);
@@ -29,12 +29,28 @@ opti.set_initial(p, [1.5;0.5])
 % x_c = opti.variable(1,1);
 % y_c = opti.variable(1,1);
 cost = 0;
-delta = 0.01;
+delta = 0.2; %good value for fitting
+% delta = 0.5; %good value for plotting
 x = SX.sym('error');
 % func = piecewise(x<-delta, delta*(-x-0.5*delta), -delta<=x<=delta, 0.5*x^2, x>delta, delta*(x-0.5*delta));
-func = (x<-delta)*(delta*(-x-0.5*delta)) + (-delta<=x)*(x<=delta)*(0.5*x^2) + (x>=delta)*(delta*(x-0.5*delta));
+func = (x<-delta)*(delta*(-x-0.5*delta)) + (-delta<=x)*(x<=delta)*(0.5*x^2) + (x>delta)*(delta*(x-0.5*delta));
 huber_cost = Function('huber_cost',{x},{func});
 
+% Plot huber function
+y_value = -1:0.01:1;
+x_value = -1:0.01:1;
+for i = 1:length(x_value)
+    y_value(i) = full(huber_cost(x_value(i)));
+end
+
+figure('Name', 'Huber function')
+hold on
+plot(x_value, 0.5*x_value.^2, 'LineWidth',2.5)
+plot(x_value, delta*(abs(x_value) - 0.5*delta), 'LineWidth',2.5)
+plot(x_value, y_value, 'LineWidth',2.5)
+
+
+% Set up cost function
 for i = 1:length(x_data)
 error = sqrt((x_data(i) - p(1))^2 + (y_data(i) - p(2))^2) - 1;
 cost = cost + huber_cost(error);
@@ -94,10 +110,10 @@ y_circle_L1 = y_c_L1 + radius * sin(alpha);
 %% Plot circles to compare methods
 figure('Name', 'CSomparison between L1 norm, L2 norm and Huber norm')
 hold on
-plot(x_circle_L1, y_circle_L1)
-plot(x_circle_L2, y_circle_L2)
-plot(x_circle_hub, y_circle_hub)
-plot(x_data, y_data)
+plot(x_circle_L1, y_circle_L1, 'LineWidth',2.5)
+plot(x_circle_L2, y_circle_L2, 'LineWidth',2.5)
+plot(x_circle_hub, y_circle_hub, 'LineWidth',2.5)
+scatter(x_data, y_data, 'LineWidth',2.5)
 legend('L1 norm', 'L2 norm', 'Huber norm', 'data points')
 xlim([0.0 4])
 ylim([-1.5 1.5])
