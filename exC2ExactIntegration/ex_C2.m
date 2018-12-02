@@ -5,7 +5,7 @@ close all;
 import casadi.*
 
 T = 1;   % End time
-N = 10; % Number of control intervals
+N = 50; % Number of control intervals
 dt = T/N;
 
 % System states
@@ -43,4 +43,4 @@ plot3(traj(1,:),traj(2,:),traj(3,:),'b-')
 axis equal
 
 %% Save the result
-save('RK4_int','traj')
+save('ExC2RK4_int','traj')

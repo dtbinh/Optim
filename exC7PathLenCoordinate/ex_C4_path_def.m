@@ -9,7 +9,7 @@ N = 100; % Number of control intervals
 dt = T/N;
 t = linspace(0,T,N+1); % time vector
 
-fit = load('fit');
+fit = load('ExC3');
 U_ref = fit.U_sol;
 
 meas_pos = [2*t;0.1*t.*sin(16*pi*t);0.1*t.*cos(16*pi*t)];

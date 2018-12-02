@@ -55,7 +55,7 @@ for k=1:N+1
     % System states
     p{k} = opti.variable(3,1); % object position
     Rt{k}  = opti.variable(3,3); % translational Frenet-Serret frame
-    
+
     X{k} =  [p{k};vec(Rt{k})];
 end
 
@@ -68,10 +68,10 @@ opti.subject_to(Rt{1}'*Rt{1} == eye(3));
 for k=1:N
     % Integrate current state to obtain next state
     Xk_end = rk4(ode_simp,dt,X{k},u.eval(k*dt));
-    
+
     % Gap closing constraint
     opti.subject_to(Xk_end==X{k+1});
-    
+
 end
 
 % Construct objective
@@ -170,7 +170,7 @@ for k=1:N+1
     % System states
     p{k} = opti.variable(3,1); % object position
     Rt{k}  = opti.variable(3,3); % translational Frenet-Serret frame
-    
+
     X{k} =  [p{k};vec(Rt{k})];
 end
 
@@ -189,10 +189,10 @@ opti.subject_to(p{end}==P_end);
 for k=1:N
     % Integrate current state to obtain next state
     Xk_end = rk4(ode_simp,dt,X{k},u.eval(k*dt));
-    
+
     % Gap closing constraint
     opti.subject_to(Xk_end==X{k+1});
-    
+
 end
 
 % Construct objective

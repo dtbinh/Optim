@@ -1,12 +1,12 @@
 % clear all;
 close all;
 clc;
-addpath('C:\Users\Wolf/casadi-windows-matlabR2016a-v3.4.5')
+% addpath('C:\Users\Wolf/casadi-windows-matlabR2016a-v3.4.5')
 import casadi.*
 
 %%
 T = 1;   % End time
-N = 100; % Number of control intervals
+N = 10; % Number of control intervals
 dt = T/N;
 t = linspace(0,T,N+1); % time vector
 
@@ -109,7 +109,7 @@ plot(sol.value(U)')
 plot(U_sol_s')
 legend('i1', 'i2', 'i3', 'i1_s', 'i2_s', 'i3_s')
 U_sol = sol.value(U);
-save('fit','U_sol');
+save('ExC3','U_sol');
 %% plot s as function of t
 figure()
 plot(t(1:end-1),t(1:end-1).*full(U_sol_s(1,:)))
