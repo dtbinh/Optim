@@ -6,7 +6,7 @@ clc
 addpath('C:\Users\Wolf/casadi-windows-matlabR2016a-v3.4.5')
 import casadi.*
 %%
-N = 100; % Control discretization
+N = 20; % Control discretization
 m = 80; % vehicle mass [kg]
 L = 1.5;
 
@@ -39,7 +39,7 @@ v_min = -5.;
 v_max = 5.;
 
 % Initial and terminal constraints
-x_init = [0., 0., 0., 0.];
+x_init = [0., 0., pi, 0.];
 x_final = [10., 10., 0., 0.];
 
 % Construct all constraints
@@ -89,29 +89,29 @@ figure;
 title('State trajectories')
 subplot(3,1,1)
 hold on
-plot(tgrid, posx_opt, 'b-x')
-plot(tgrid, posy_opt, 'r-o')
+plot(tgrid, posx_opt, 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',1.2)
+plot(tgrid, posy_opt, 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',1.2)
 xlabel('time [s]')
 ylabel('position [m]')
 
 subplot(3,1,2)
-plot(tgrid, vel_opt, 'b-x')
+plot(tgrid, vel_opt, 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',1.2)
 xlabel('time [s]')
 ylabel('velocity [m/s]')
 
 subplot(3,1,3)
-stairs(tgrid(1:end-1), m*a_opt, 'b-x')
+stairs(tgrid(1:end-1), m*a_opt, 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',1.2)
 xlabel('time [s]')
 ylabel('acceleration [m/s^2]')
 
 figure
-stairs(tgrid(1:end-1), delta_opt, 'b-x')
+stairs(tgrid(1:end-1), delta_opt, 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
 xlabel('time [s]')
 ylabel('delta')
 
 figure
 hold on
-plot(posx_opt,posy_opt)
+plot(posx_opt,posy_opt, 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.5)
 xlabel('position-x [m]')
 ylabel('position-y [m]')
 title('Top view')

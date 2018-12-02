@@ -7,7 +7,7 @@ import splines.*
 
 %%
 T = 1;   % End time
-N = 30; % Number of control intervals
+N = 20; % Number of control intervals
 dt = T/N;
 t = linspace(0,T,N+1); % time vector
 
@@ -84,7 +84,7 @@ end
 objective_reg = 0;
 for k=1:N-1
     e = u.eval(t(k+1)) - u.eval(t(k));
-    objective_reg = objective_reg + 1e-5*e'*e;
+    objective_reg = objective_reg + 1e-3*e'*e;
 end
 
 % Initialize states
@@ -103,7 +103,7 @@ sol = opti.solve();
 figure
 hold on
 traj = sol.value([p{:}]);
-plot3(traj(1,:),traj(2,:),traj(3,:),'ko')
+plot3(traj(1,:),traj(2,:),traj(3,:),'co')
 plot3(meas_pos(1,:),meas_pos(2,:),meas_pos(3,:), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.5)
 axis equal
 
@@ -112,8 +112,8 @@ figure
 u = sol.value(u);
 hold on
 fit = load('fit');
-plot(t, u.list_eval(t(1:end-1)), 'Color', [0.6350, 0.0780, 0.1840])
-plot(t(1:end-1), fit.U_sol, 'Color', [0.3010, 0.7450, 0.9330])
+plot(t, u.list_eval(t), 'Color', [0.6350, 0.0780, 0.1840])
+plot(t, U_ref, 'Color', [0.3010, 0.7450, 0.9330])
 
 u_sol = sol.value(u);
 % save('fit','u_sol');
