@@ -107,7 +107,7 @@ plot(sol.value(U)')
 U_sol = sol.value(U);
 
 %% Save the result
-save('fit','traj');
+save('ExC3','U_sol', 'traj');
 
 
 

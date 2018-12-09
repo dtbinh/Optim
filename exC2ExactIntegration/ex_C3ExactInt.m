@@ -129,5 +129,5 @@ U_solx = solx.value(Ux);
 
 
 %% Save the result
-save('fitx','trajx');
+save('ExC3Exact','U_solx','trajx');
 

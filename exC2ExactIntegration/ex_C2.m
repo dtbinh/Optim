@@ -5,7 +5,7 @@ close all;
 import casadi.*
 
 T = 1;   % End time
-N = 50; % Number of control intervals
+N = 10; % Number of control intervals
 dt = T/N;
 
 % System states
