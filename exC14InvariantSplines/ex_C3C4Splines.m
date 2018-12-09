@@ -111,7 +111,7 @@ axis equal
 view([-76 14])
 u_sol = sol.value(u);
 u_full = full(u_sol);
-fit = load('fit');
+fit = load('U_mult_shoot');
 no_spline = fit.U_sol;
 u = u_full.list_eval(t(1:end-1));
 figure
@@ -188,7 +188,7 @@ opti.subject_to(p{end}==P_end);
 % Dynamic constraints
 for k=1:N
     % Integrate current state to obtain next state
-    Xk_end = rk4(ode_simp,dt,X{k},u.eval(k*dt));
+    Xk_end = rk4(ode_simp,dt,X{k},u.eval(t(k)));
 
     % Gap closing constraint
     opti.subject_to(Xk_end==X{k+1});
@@ -229,7 +229,8 @@ axis equal
 legend('new traject', 'measurement')
 
 view([-76 14])
-u_new = full(u_sol_C4).list_eval(t(1:end-1));
+u_new = full(u_sol_C4);
+u_new = u_new.list_eval(t(1:end-1));
 u = u_ref.list_eval(t(1:end-1));
 figure
 hold on
@@ -240,4 +241,4 @@ plot(t(1:end-1), u(:,2:3), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
 legend('new traject', 'measurement')
 
 %% Save results
-save('Ex_C4spline','u_sol_C4','traj');
+% save('Ex_C4spline','u_sol_C4','traj');

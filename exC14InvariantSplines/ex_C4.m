@@ -5,11 +5,11 @@ clc;
 import casadi.*
 
 T = 1;   % End time
-N = 100; % Number of control intervals
+N = 30; % Number of control intervals
 dt = T/N;
 t = linspace(0,T,N+1); % time vector
 
-fit = load('fit');
+fit = load('U_mult_shoot');
 U_ref = fit.U_sol;
 
 meas_pos = [t;0.1*t.*sin(4*pi*t);0.1*t.*cos(4*pi*t)];

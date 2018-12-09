@@ -12,7 +12,7 @@ t = linspace(0,T,N+1); % time vector
 fit = load('ExC3_s');
 U_ref = fit.U_sol_s;
 
-meas_pos = [t;0.1*t.*sin(4*pi*t);0.1*t.*cos(4*pi*t)];
+meas_pos = [2*t;0.1*t.*sin(8*pi*t);0.1*t.*cos(8*pi*t)];
 % meas_pos = [2*t;0.1*t.*sin(8*pi*t);0.1*t.*cos(8*pi*t)];
 
 
@@ -61,8 +61,6 @@ opti.subject_to(Rt{1}'*Rt{1} == eye(3));
 
 P_start = [0;1;0];
 P_end = [1;1;1];
-% P_end = [2;2;2];
-
 
 opti.subject_to(p{1}==P_start);
 opti.subject_to(p{end}==P_end);
@@ -111,13 +109,10 @@ view([-76 14])
 
 u_new = full(sol.value(U))';
 U_ref = U_ref';
-
 figure
 hold on
-% plot(t(1:end-1), ones(1,length(u_new(:,1))), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
-% plot(t(1:end-1), ones(1,length(U_ref(:,1))), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
-plot(t(1:end-1), u_new(:,1), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
-plot(t(1:end-1), U_ref(:,1), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
+plot(t(1:end-1), ones(1,length(u_new(:,1))), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
+plot(t(1:end-1), ones(1,length(U_ref(:,1))), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
 plot(t(1:end-1), u_new(:,2:3), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
 plot(t(1:end-1), U_ref(:,2:3), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
 legend('new traject', 'measurement')
