@@ -1,18 +1,19 @@
-% clear all;
-close all;
+clear all;
+% close all;
 clc;
-
 import casadi.*
 
+%%
 T = 1;   % End time
-N = 100; % Number of control intervals
+N = 40; % Number of control intervals
 dt = T/N;
 t = linspace(0,T,N+1); % time vector
 
-fit = load('ExC3');
-U_ref = fit.U_sol;
+fit = load('ExC3_s');
+U_ref = fit.U_sol_s;
 
-meas_pos = [2*t;0.1*t.*sin(16*pi*t);0.1*t.*cos(16*pi*t)];
+meas_pos = [t;0.1*t.*sin(4*pi*t);0.1*t.*cos(4*pi*t)];
+% meas_pos = [2*t;0.1*t.*sin(8*pi*t);0.1*t.*cos(8*pi*t)];
 
 
 % System states
@@ -28,8 +29,8 @@ u = [i1 ; i2 ; i3];
 nu = size(u,1);
 
 % State dynamics equations of the form: dx/dt = f(x,u,t)
-dRt = Rt*skew([i3;i2;0]);
-dp = Rt*[i1;0;0];
+dRt = i1*Rt*skew([i3;i2;0]);
+dp = i1*Rt*[1;0;0];
 
 rhs = [dp;dRt(:)];
 
@@ -60,6 +61,8 @@ opti.subject_to(Rt{1}'*Rt{1} == eye(3));
 
 P_start = [0;1;0];
 P_end = [1;1;1];
+% P_end = [2;2;2];
+
 
 opti.subject_to(p{1}==P_start);
 opti.subject_to(p{end}==P_end);
@@ -67,7 +70,7 @@ opti.subject_to(p{end}==P_end);
 % Dynamic constraints
 for k=1:N
     % Integrate current state to obtain next state
-    Xk_end = rk4(ode_simp,dt*U(1,k),X{k},U(:,k));
+    Xk_end = rk4(ode_simp,dt,X{k},U(:,k));
     
     % Gap closing constraint
     opti.subject_to(Xk_end==X{k+1});
@@ -97,16 +100,25 @@ sol = opti.solve();
 
 figure
 hold on
-plot3(meas_pos(1,:),meas_pos(2,:),meas_pos(3,:),'b-')
-
 traj = sol.value([p{:}]);
-plot3(traj(1,:),traj(2,:),traj(3,:),'ro')
+plot3(traj(1,:),traj(2,:),traj(3,:), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.5)
+plot3(meas_pos(1,:),meas_pos(2,:),meas_pos(3,:),'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.5)
 plot3(P_start(1),P_start(2),P_start(3),'kx')
 plot3(P_end(1),P_end(2),P_end(3),'ks')
 axis equal
-
+legend('new traject', 'measurement')
 view([-76 14])
+
+u_new = full(sol.value(U))';
+U_ref = U_ref';
+
 figure
 hold on
-plot(sol.value(U)')
-plot(U_ref')
+% plot(t(1:end-1), ones(1,length(u_new(:,1))), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
+% plot(t(1:end-1), ones(1,length(U_ref(:,1))), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
+plot(t(1:end-1), u_new(:,1), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
+plot(t(1:end-1), U_ref(:,1), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
+plot(t(1:end-1), u_new(:,2:3), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
+plot(t(1:end-1), U_ref(:,2:3), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
+legend('new traject', 'measurement')
+

@@ -1,25 +1,116 @@
 clear all;
 close all;
 clc;
-addpath('C:\Users\Wolf\Documents\2de Master\Optimization\optispline_windows_matlabR2014a_v0.1')
+addpath('C:\Users\Wolf/casadi-windows-matlabR2016a-v3.4.5')
 import casadi.*
-import splines.*
 
-%%
+%% frenet serret invariants as function of s
 T = 1;   % End time
-N = 30; % Number of control intervals
+N = 40; % Number of control intervals
 dt = T/N;
 t = linspace(0,T,N+1); % time vector
 
+% System states
+p  = SX.sym('p',3,1); % object position
+Rt = SX.sym('Rt',3,3); % translational Frenet-Serret frame
+x = [p; Rt(:)];
+
+% System controls (invariants)
+i1 = SX.sym('i1'); % object translation speed
+i2 = SX.sym('i2'); % curvature speed translational Frenet-Serret
+i3 = SX.sym('i3'); % torsion speed translational Frenet-Serret
+u = [i1 ; i2 ; i3];
+nu = size(u,1);
+
+% State dynamics equations of the form: dx/dt = f(x,u,t)
+dRt = i1*Rt*skew([i3;i2;0]);
+dp = i1*Rt*[1;0;0];
+
+rhs = [dp; dRt(:)];
+
+% Define ordinary differential equations
+ode_simp = Function('ode_simp',{x,u},{rhs});
+
+opti = casadi.Opti();
+
+% Create decision variables and parameters for multipleshooting
+p = cell(1,N+1);
+Rt = cell(1,N+1);
+X = cell(1,N+1);
+
+for k=1:N+1
+    % System states
+    p{k} = opti.variable(3,1); % object position
+    Rt{k}  = opti.variable(3,3); % translational Frenet-Serret frame
+    
+    X{k} =  [p{k};vec(Rt{k})];
+end
+
+U = opti.variable(nu,N);
+
+opti.subject_to(U(1,:)>=0);
+
+% FS_frame - constrain to be orthogonal (only needed for one timestep, property is propagated by integrator)
+opti.subject_to(Rt{1}'*Rt{1} == eye(3));
+
+% Dynamic constraints
+for k=1:N
+    % Integrate current state to obtain next state
+    Xk_end = rk4(ode_simp,dt,X{k},U(:,k));
+%     Xk_end = rk4(ode_simp,dt,X{k},U(:,k));
+
+    
+    % Gap closing constraint
+    opti.subject_to(Xk_end==X{k+1});
+    
+end
+
+% Construct objective
+objective_fit = 0;
 meas_pos = [t;0.1*t.*sin(4*pi*t);0.1*t.*cos(4*pi*t)];
+% meas_pos = [2*t;0.1*t.*sin(8*pi*t);0.1*t.*cos(8*pi*t)];
 
-opti = splines.OptiSpline();
 
-% Set up splines
-d = 5; % degree of splines
-L = T; % spline domain [0 , L ]
-n = 15; % number of knots
-Bl  = BSplineBasis([0 , L], d, n);
+for k=1:N+1
+    e = p{k} - meas_pos(:,k); % position error
+    objective_fit = objective_fit + e'*e;
+end
+
+objective_reg = 0;
+for k=1:N-1
+    e = U(:,k+1) - U(:,k);
+    objective_reg = objective_reg + 1e-4*e'*e;
+end
+
+% Initialize states
+for k=1:N+1
+    opti.set_initial(Rt{k}, eye(3));
+    opti.set_initial(p{k}, meas_pos(:,k));
+end
+
+opti.minimize(objective_fit + objective_reg);
+opti.solver('ipopt');
+
+% Solve the NLP
+sol = opti.solve();
+%%
+
+sol.value(objective_fit)
+
+figure
+hold on
+traj = sol.value([p{:}]);
+plot3(traj(1,:),traj(2,:),traj(3,:),'ko')
+plot3(meas_pos(1,:),meas_pos(2,:),meas_pos(3,:), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.5)
+legend('invariant fit', 'measurement')
+axis equal
+view([-76 14])
+
+U_sol_s = sol.value(U);
+save('ExC3_s','U_sol_s');
+
+
+%% do same again for t
 
 % System states
 p  = SX.sym('p',3,1); % object position
@@ -42,9 +133,7 @@ rhs = [dp; dRt(:)];
 % Define ordinary differential equations
 ode_simp = Function('ode_simp',{x,u},{rhs});
 
-
-% System controls (invariants)
-u = opti.Function(Bl, [3,1]);
+opti = casadi.Opti();
 
 % Create decision variables and parameters for multipleshooting
 p = cell(1,N+1);
@@ -59,7 +148,9 @@ for k=1:N+1
     X{k} =  [p{k};vec(Rt{k})];
 end
 
-opti.subject_to(u(1)>=0);
+U = opti.variable(nu,N);
+
+opti.subject_to(U(1,:)>=0);
 
 % FS_frame - constrain to be orthogonal (only needed for one timestep, property is propagated by integrator)
 opti.subject_to(Rt{1}'*Rt{1} == eye(3));
@@ -67,7 +158,9 @@ opti.subject_to(Rt{1}'*Rt{1} == eye(3));
 % Dynamic constraints
 for k=1:N
     % Integrate current state to obtain next state
-    Xk_end = rk4(ode_simp,dt,X{k},u.eval(k*dt));
+    Xk_end = rk4(ode_simp,dt,X{k},U(:,k));
+%     Xk_end = rk4(ode_simp,dt,X{k},U(:,k));
+
     
     % Gap closing constraint
     opti.subject_to(Xk_end==X{k+1});
@@ -83,8 +176,8 @@ end
 
 objective_reg = 0;
 for k=1:N-1
-    e = u.eval(t(k+1)) - u.eval(t(k));
-    objective_reg = objective_reg + 1e-5*e'*e;
+    e = U(:,k+1) - U(:,k);
+    objective_reg = objective_reg + 1e-4*e'*e;
 end
 
 % Initialize states
@@ -99,145 +192,52 @@ opti.solver('ipopt');
 % Solve the NLP
 sol = opti.solve();
 %%
+sol.value(objective_fit)
+U_sol = sol.value(U);
+u_full = full(U_sol_s);
+
+
+s = zeros(1,length(t));
+s(1) = 0;
+for i = 2:length(t)-1
+   s(i) = dt* u_full(1,i) + s(i-1);
+end
+
 
 figure
 hold on
 traj = sol.value([p{:}]);
 plot3(traj(1,:),traj(2,:),traj(3,:),'ko')
 plot3(meas_pos(1,:),meas_pos(2,:),meas_pos(3,:), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.5)
+legend('spline invariants', 'measurement')
 axis equal
-
 view([-76 14])
-figure
-u = sol.value(u);
-hold on
-fit = load('fit');
-plot(t, u.list_eval(t(1:end-1)), 'Color', [0.6350, 0.0780, 0.1840])
-plot(t(1:end-1), fit.U_sol, 'Color', [0.3010, 0.7450, 0.9330])
 
-u_sol = sol.value(u);
-% save('fit','u_sol');
-
-%% ========================================================================
-%  Ex_C4Splines
-%  ========================================================================
-
-% fit = load('fit');
-u_ref = u_sol;
-
-T = 1;   % End time
-N = 100; % Number of control intervals
-dt = T/N;
-t = linspace(0,T,N+1); % time vector
-
-% NOTE: not used to fit here, only for comparison in figures.
-% Actual fit is on spline solution from ex_C3Splines (u_ref)
-meas_pos = [t;0.1*t.*sin(4*pi*t);0.1*t.*cos(4*pi*t)];
-
-opti = splines.OptiSpline();
-
-% Set up splines
-d = 15; % number of knots
-L = T; % spline domain [0 , L ]
-n = 5; % degree of splines
-Bl  = BSplineBasis([0 , L], d, n);
-
-% System states
-p = SX.sym('p',3,1); % object position
-Rt  = SX.sym('Rt' ,3,3); % translational Frenet-Serret frame
-x = [p;Rt(:)];
-
-% System controls (invariants)
-i1 = SX.sym('i1'); % object translation speed
-i2 = SX.sym('i2'); % curvature speed translational Frenet-Serret
-i3 = SX.sym('i3'); % torsion speed translational Frenet-Serret
-u = [i1 ; i2 ; i3];
-nu = size(u,1);
-
-% State dynamics equations of the form: dx/dt = f(x,u,t)
-dRt = Rt*skew([i3;i2;0]);
-dp = Rt*[i1;0;0];
-
-rhs = [dp;dRt(:)];
-
-% Define ordinary differential equations
-ode_simp = Function('ode_simp',{x,u},{rhs});
-
-
-% System controls (invariants)
-u = opti.Function(Bl, [3,1]);
-
-% Create decision variables and parameters for multipleshooting
-p = cell(1,N+1);
-Rt = cell(1,N+1);
-X = cell(1,N+1);
-
-for k=1:N+1
-    % System states
-    p{k} = opti.variable(3,1); % object position
-    Rt{k}  = opti.variable(3,3); % translational Frenet-Serret frame
-    
-    X{k} =  [p{k};vec(Rt{k})];
-end
-
-opti.subject_to(u(1)>=0); % Can only move forward
-
-% FS_frame - constrain to be orthogonal (only needed for one timestep, property is propagated by integrator)
-opti.subject_to(Rt{1}'*Rt{1} == eye(3));
-
-P_start = [0;1;0];
-P_end = [1;1;1];
-
-opti.subject_to(p{1}==P_start);
-opti.subject_to(p{end}==P_end);
-
-% Dynamic constraints
-for k=1:N
-    % Integrate current state to obtain next state
-    Xk_end = rk4(ode_simp,dt,X{k},u.eval(k*dt));
-    
-    % Gap closing constraint
-    opti.subject_to(Xk_end==X{k+1});
-    
-end
-
-% Construct objective
-objective = 0;
-for k=1:N
-    e = u.eval(t(k)) - u_ref.eval(t(k)); % invariant error
-    objective = objective + e'*e;
-end
-
-opti.set_initial(u, u_ref);
-
-% Initialize states
-for k=1:N+1
-    opti.set_initial(Rt{k}, eye(3));
-end
-
-opti.minimize(objective);
-opti.solver('ipopt');
-
-% Solve the NLP
-sol = opti.solve();
-
-u_sol_C4 = sol.value(u);
-%%
 
 figure
 hold on
-plot3(meas_pos(1,:),meas_pos(2,:),meas_pos(3,:),'b-')
+plot(t(1:end-1), ones(1,length(u_full(1,:))), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.5)
+plot(t(1:end-1), u_full(2,:), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.5)
+plot(t(1:end-1), u_full(3,:), 'Color', [0.9290, 0.6940, 0.1250], 'LineWidth',2.5)
+legend('i1', 'i2', 'i3')
 
-traj = sol.value([p{:}]);
-plot3(traj(1,:),traj(2,:),traj(3,:),'ro')
-plot3(P_start(1),P_start(2),P_start(3),'kx')
-plot3(P_end(1),P_end(2),P_end(3),'ks')
-axis equal
+save('ExC3','U_sol');
+%% plot s as function of t
+figure()
+plot(t(1:end-1),t(1:end-1).*full(U_sol_s(1,:)))
 
-view([-76 14])
-figure
-hold on
-plot(u_sol_C4.list_eval(t))
-plot(u_ref.list_eval(t))
-
+% figure()
+% plot(t(1:end-1), U_sol')
+% legend('i1', 'i2', 'i3')
+% 
+% figure()
+% plot(t(1:end-1).*U_sol_s(1,:), U_sol_s')
+% legend('i1_s', 'i2_s', 'i3_s')
+% 
+% figure()
+% hold on
+% plot(t(1:end-1), U_sol')
+% plot(t(1:end-1), ones(1,length(U_sol_s(:,2:3)')))
+% plot(t(1:end-1), (U_sol_s(:,2:3)'))
+% legend('i1', 'i2', 'i3', 'i1_s', 'i2_s', 'i3_s')
 
