@@ -22,15 +22,15 @@ Rt  = SX.sym('Rt' ,3,3); % translational Frenet-Serret frame
 x = [p;Rt(:)];
 
 % System controls (invariants)
-i1 = SX.sym('i1'); % object translation speed
-i2 = SX.sym('i2'); % curvature speed translational Frenet-Serret
-i3 = SX.sym('i3'); % torsion speed translational Frenet-Serret
-u = [i1 ; i2 ; i3];
+i1t = SX.sym('i1t'); % object translation speed
+i2s = SX.sym('i2s'); % curvature speed translational Frenet-Serret
+i3s = SX.sym('i3s'); % torsion speed translational Frenet-Serret
+u = [i1t ; i2s ; i3s];
 nu = size(u,1);
 
 % State dynamics equations of the form: dx/dt = f(x,u,t)
-dRt = i1*Rt*skew([i3;i2;0]);
-dp = i1*Rt*[1;0;0];
+dRt = i1t*Rt*skew([i3s;i2s;0]);
+dp = i1t*Rt*[1;0;0];
 
 rhs = [dp;dRt(:)];
 
