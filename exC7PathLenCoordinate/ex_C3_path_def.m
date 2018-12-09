@@ -1,7 +1,7 @@
 clear all;
 close all;
 clc;
-addpath('C:\Users\Wolf/casadi-windows-matlabR2016a-v3.4.5')
+% addpath('C:\Users\Wolf/casadi-windows-matlabR2016a-v3.4.5')
 import casadi.*
 
 %% frenet serret invariants as function of s
@@ -16,15 +16,15 @@ Rt = SX.sym('Rt',3,3); % translational Frenet-Serret frame
 x = [p; Rt(:)];
 
 % System controls (invariants)
-i1 = SX.sym('i1'); % object translation speed
-i2 = SX.sym('i2'); % curvature speed translational Frenet-Serret
-i3 = SX.sym('i3'); % torsion speed translational Frenet-Serret
-u = [i1 ; i2 ; i3];
+i1t = SX.sym('i1t'); % object translation speed
+i2s = SX.sym('i2s'); % curvature speed translational Frenet-Serret
+i3s = SX.sym('i3s'); % torsion speed translational Frenet-Serret
+u = [i1t ; i2s ; i3s];
 nu = size(u,1);
 
 % State dynamics equations of the form: dx/dt = f(x,u,t)
-dRt = i1*Rt*skew([i3;i2;0]);
-dp = i1*Rt*[1;0;0];
+dRt = i1t*Rt*skew([i3s;i2s;0]);
+dp = i1t*Rt*[1;0;0];  % i1s = 1
 
 rhs = [dp; dRt(:)];
 
@@ -191,9 +191,13 @@ opti.solver('ipopt');
 
 % Solve the NLP
 sol = opti.solve();
+
+
 %%
 sol.value(objective_fit)
+% time solution:
 U_sol = sol.value(U);
+% geometric solution:
 u_full = full(U_sol_s);
 
 
@@ -219,7 +223,7 @@ hold on
 plot(s(1:end-1), ones(1,length(u_full(1,:))), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.5)
 plot(s(1:end-1), u_full(2,:), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.5)
 plot(s(1:end-1), u_full(3,:), 'Color', [0.9290, 0.6940, 0.1250], 'LineWidth',2.5)
-legend('i1', 'i2', 'i3')
+legend('i1s', 'i2s', 'i3s')
 
 save('ExC3','U_sol');
 %% plot s as function of t
