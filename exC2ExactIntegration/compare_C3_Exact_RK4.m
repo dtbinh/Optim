@@ -35,5 +35,5 @@ hold on
 plot(diff(1,:)./exact.U_solx(1,:),'Color', [0.9290, 0.6940, 0.1250], 'LineWidth',2.5)
 plot(diff(2,:)./exact.U_solx(2,:),'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.5)
 plot(diff(3,:)./exact.U_solx(3,:),'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.5)
-legend('Difference i_1', 'Difference i_2', 'Difference i_3')
-
+legend({'Difference i_1', 'Difference i_2', 'Difference i_3'},'FontSize',14)
+xlabel('Time [s]')

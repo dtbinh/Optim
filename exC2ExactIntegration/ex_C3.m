@@ -5,7 +5,7 @@ clc;
 import casadi.*
 
 T = 1;   % End time
-N = 10; % Number of control intervals
+N = 50; % Number of control intervals
 dt = T/N;
 t = linspace(0,T,N+1); % time vector
 

@@ -43,4 +43,4 @@ plot3(traj(1,:),traj(2,:),traj(3,:),'b-')
 axis equal
 
 %% Save the result
-save('ExC2RK4_int','traj')
+% save('ExC2RK4_int','traj', '')

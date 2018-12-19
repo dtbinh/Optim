@@ -1,7 +1,7 @@
 clear all;
 close all;
 clc;
-addpath('C:\Users\Wolf\Documents\2de Master\Optimization\optispline_windows_matlabR2014a_v0.1')
+% addpath('C:\Users\Wolf\Documents\2de Master\Optimization\optispline_windows_matlabR2014a_v0.1')
 import casadi.*
 import splines.*
 

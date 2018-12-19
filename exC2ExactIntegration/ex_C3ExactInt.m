@@ -7,8 +7,8 @@ close all
 
 import casadi.*
 
-Tx = 1;   % End time
-Nx = 10; % Number of control intervals
+Tx = 1;  % End time
+Nx = 50; % Number of control intervals
 dtx = Tx/Nx;
 tx = linspace(0,Tx,Nx+1); % time vector
 
