@@ -1,7 +1,7 @@
 clear all;
 close all;
 clc;
-% addpath('C:\Users\Wolf/casadi-windows-matlabR2016a-v3.4.5')
+addpath('C:\Users\Wolf/casadi-windows-matlabR2016a-v3.4.5')
 import casadi.*
 
 %% frenet serret invariants as function of s
@@ -223,6 +223,7 @@ plot(s(1:end-1), ones(1,length(u_full(1,:))), 'Color', [0.6350, 0.0780, 0.1840],
 plot(s(1:end-1), u_full(2,:), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.5)
 plot(s(1:end-1), u_full(3,:), 'Color', [0.9290, 0.6940, 0.1250], 'LineWidth',2.5)
 legend('i1s', 'i2s', 'i3s')
+xlabel('pathlength-s [m]')
 xlim([s(1) s(end-1)])
 
 save('ExC3','U_sol');

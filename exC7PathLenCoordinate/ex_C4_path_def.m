@@ -133,6 +133,7 @@ plot(s2(1:end-1), ones(1,length(U_ref(:,1))), 'Color', [0.3010, 0.7450, 0.9330],
 plot(s1(1:end-1), u_new(:,2:3), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
 plot(s2(1:end-1), U_ref(:,2:3), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
 legend('new trajectory', 'reference')
+xlabel('pathlength-s [m]')
 xlim([s1(1) s1(end-1)])
 
 
