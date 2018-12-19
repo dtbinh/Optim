@@ -120,7 +120,8 @@ plot(t(1:end-1), u(:,1), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
 plot(t(1:end-1), no_spline(1,:), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
 plot(t(1:end-1), u(:,2:3), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
 plot(t(1:end-1), no_spline(2:3,:), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
-legend('spline invariants', 'no spline invariants')
+xlabel('Time [s]')
+legend('spline invariants', 'multiple shooting')
 % save('fit','u_sol');
 
 %% ========================================================================
@@ -238,6 +239,7 @@ plot(t(1:end-1), u_new(:,1), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
 plot(t(1:end-1), u(:,1), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
 plot(t(1:end-1), u_new(:,2:3), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
 plot(t(1:end-1), u(:,2:3), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
+xlabel('Time [s]')
 legend('new trajectory', 'reference')
 
 %% Save results
