@@ -22,7 +22,7 @@ radius = 1;
 opti = casadi.Opti();
 %% Huber norm
 si = opti.variable(1,5);
-p = opti.variable(1,2);
+p = opti.variable(1,2); % Center of the circle.
 opti.minimize(sum(si));
 opti.set_initial(p, [1.5;0.5])
 
