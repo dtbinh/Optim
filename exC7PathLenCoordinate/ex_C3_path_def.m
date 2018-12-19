@@ -68,7 +68,7 @@ end
 % Construct objective
 objective_fit = 0;
 meas_pos = [t;0.1*t.*sin(4*pi*t);0.1*t.*cos(4*pi*t)];
-% meas_pos = [2*t;0.1*t.*sin(8*pi*t);0.1*t.*cos(8*pi*t)];
+% meas_pos = [t;0.1*t.*sin(8*pi*t);0.1*t.*cos(8*pi*t)];
 
 
 for k=1:N+1
@@ -102,7 +102,7 @@ hold on
 traj = sol.value([p{:}]);
 plot3(traj(1,:),traj(2,:),traj(3,:),'ko')
 plot3(meas_pos(1,:),meas_pos(2,:),meas_pos(3,:), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.5)
-legend('invariant fit', 'measurement')
+legend('invariant fit', 'reference')
 axis equal
 view([-76 14])
 
@@ -200,7 +200,6 @@ U_sol = sol.value(U);
 % geometric solution:
 u_full = full(U_sol_s);
 
-
 s = zeros(1,length(t));
 s(1) = 0;
 for i = 2:length(t)-1
@@ -208,14 +207,14 @@ for i = 2:length(t)-1
 end
 
 
-figure
-hold on
-traj = sol.value([p{:}]);
-plot3(traj(1,:),traj(2,:),traj(3,:),'ko')
-plot3(meas_pos(1,:),meas_pos(2,:),meas_pos(3,:), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.5)
-legend('spline invariants', 'measurement')
-axis equal
-view([-76 14])
+% figure
+% hold on
+% traj = sol.value([p{:}]);
+% plot3(traj(1,:),traj(2,:),traj(3,:),'ko')
+% plot3(meas_pos(1,:),meas_pos(2,:),meas_pos(3,:), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.5)
+% legend('spline invariants', 'measurement')
+% axis equal
+% view([-76 14])
 
 
 figure
@@ -224,11 +223,12 @@ plot(s(1:end-1), ones(1,length(u_full(1,:))), 'Color', [0.6350, 0.0780, 0.1840],
 plot(s(1:end-1), u_full(2,:), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.5)
 plot(s(1:end-1), u_full(3,:), 'Color', [0.9290, 0.6940, 0.1250], 'LineWidth',2.5)
 legend('i1s', 'i2s', 'i3s')
+xlim([s(1) s(end-1)])
 
 save('ExC3','U_sol');
 %% plot s as function of t
-figure()
-plot(t(1:end-1),t(1:end-1).*full(U_sol_s(1,:)))
+% figure()
+% plot(t(1:end-1),t(1:end-1).*full(U_sol_s(1,:)))
 
 % figure()
 % plot(t(1:end-1), U_sol')

@@ -13,7 +13,7 @@ fit = load('ExC3_s');
 U_ref = fit.U_sol_s;
 
 meas_pos = [t;0.1*t.*sin(4*pi*t);0.1*t.*cos(4*pi*t)];
-% meas_pos = [2*t;0.1*t.*sin(8*pi*t);0.1*t.*cos(8*pi*t)];
+% meas_pos = [t;0.1*t.*sin(8*pi*t);0.1*t.*cos(8*pi*t)];
 
 
 % System states
@@ -106,19 +106,33 @@ plot3(meas_pos(1,:),meas_pos(2,:),meas_pos(3,:),'Color', [0.3010, 0.7450, 0.9330
 plot3(P_start(1),P_start(2),P_start(3),'kx')
 plot3(P_end(1),P_end(2),P_end(3),'ks')
 axis equal
-legend('new traject', 'measurement')
+legend('new trajectory', 'reference')
 view([-76 14])
 
 u_new = full(sol.value(U))';
 U_ref = U_ref';
 
+s1 = zeros(1,length(t));
+s1(1) = 0;
+for i = 2:length(t)-1
+   s1(i) = dt*u_new(i,1) + s1(i-1);
+end
+
+s2 = zeros(1,length(t));
+s2(1) = 0;
+for i = 2:length(t)-1
+   s2(i) = dt*U_ref(i,1) + s2(i-1);
+end
+
 figure
 hold on
-% plot(t(1:end-1), ones(1,length(u_new(:,1))), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
-% plot(t(1:end-1), ones(1,length(U_ref(:,1))), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
-plot(t(1:end-1), u_new(:,1), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
-plot(t(1:end-1), U_ref(:,1), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
-plot(t(1:end-1), u_new(:,2:3), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
-plot(t(1:end-1), U_ref(:,2:3), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
-legend('new traject', 'measurement')
+plot(s1(1:end-1), ones(1,length(u_new(:,1))), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
+plot(s2(1:end-1), ones(1,length(U_ref(:,1))), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
+% plot(s1(1:end-1), u_new(:,1), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
+% plot(s2(1:end-1), U_ref(:,1), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
+plot(s1(1:end-1), u_new(:,2:3), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
+plot(s2(1:end-1), U_ref(:,2:3), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
+legend('new trajectory', 'reference')
+xlim([s1(1) s1(end-1)])
+
 

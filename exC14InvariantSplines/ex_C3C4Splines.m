@@ -105,7 +105,7 @@ hold on
 traj = sol.value([p{:}]);
 plot3(traj(1,:),traj(2,:),traj(3,:),'ko')
 plot3(meas_pos(1,:),meas_pos(2,:),meas_pos(3,:), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.5)
-legend('spline invariants', 'measurement')
+legend('spline invariant fit', 'reference')
 axis equal
 
 view([-76 14])
@@ -226,7 +226,7 @@ plot3(meas_pos(1,:),meas_pos(2,:),meas_pos(3,:),'Color', [0.3010, 0.7450, 0.9330
 % plot3(P_start(1),P_start(2),P_start(3),'kx')
 % plot3(P_end(1),P_end(2),P_end(3),'ks')
 axis equal
-legend('new traject', 'measurement')
+legend('new trajectory', 'reference')
 
 view([-76 14])
 u_new = full(u_sol_C4);
@@ -238,7 +238,7 @@ plot(t(1:end-1), u_new(:,1), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
 plot(t(1:end-1), u(:,1), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
 plot(t(1:end-1), u_new(:,2:3), 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth',2.0)
 plot(t(1:end-1), u(:,2:3), 'Color', [0.3010, 0.7450, 0.9330], 'LineWidth',2.0)
-legend('new traject', 'measurement')
+legend('new trajectory', 'reference')
 
 %% Save results
 % save('Ex_C4spline','u_sol_C4','traj');
